@@ -8,7 +8,7 @@ export enum UserRole {
 }
 
 export interface PushNotification {
-  iconUrl: string;
+  icon: string;
   appName: string;
   message: string;
 }
