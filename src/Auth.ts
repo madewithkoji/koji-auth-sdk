@@ -11,6 +11,7 @@ export interface PushNotification {
   icon: string;
   appName: string;
   message: string;
+  ref?: string;
 }
 
 export default class Auth {
