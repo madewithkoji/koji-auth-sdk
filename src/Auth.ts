@@ -92,6 +92,24 @@ export default class Auth {
     }
   }
 
+  // Push a notification to the owner of the pp
+  public async pushNotificationToOwner(notification: string): Promise<void> {
+    try {
+      await fetch(
+        this.buildUri('/v1/apps/auth/consumer/pushNotification'),
+        {
+          method: 'POST',
+          headers: this.getHeaders() as any,
+          body: JSON.stringify({
+            notification,
+          }),
+        },
+      );
+    } catch (err) {
+      //
+    }
+  }
+
   private getHeaders(userToken?: UserToken): {[index: string]: string|undefined} {
     const headers: {[index: string]: string|undefined} = {
       'Content-Type': 'application/json',
