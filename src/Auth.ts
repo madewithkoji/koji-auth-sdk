@@ -7,6 +7,12 @@ export enum UserRole {
   UNKNOWN = 'unknown',
 }
 
+export interface PushNotification {
+  iconUrl: string;
+  appName: string;
+  message: string;
+}
+
 export default class Auth {
   private readonly projectId?: string;
   private readonly projectToken?: string;
@@ -93,7 +99,7 @@ export default class Auth {
   }
 
   // Push a notification to the owner of the pp
-  public async pushNotificationToOwner(notification: string): Promise<void> {
+  public async pushNotificationToOwner(notification: PushNotification): Promise<void> {
     try {
       await fetch(
         this.buildUri('/v1/apps/auth/consumer/pushNotification'),
