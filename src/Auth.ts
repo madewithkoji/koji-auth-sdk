@@ -45,7 +45,18 @@ export default class Auth {
 
   // Ask Koji for a token identifying the current user, which can be used to
   // resolve the user's role
-  public getToken(callback: (userToken: UserToken) => void, forceRefresh: boolean = false) {
+  public getToken(forceRefresh: boolean = false): Promise<UserToken> {
+    return new Promise((resolve) => {
+      this.getTokenWithCallback((token) => {
+        resolve(token);
+      }, forceRefresh);
+    });
+  }
+
+  public getTokenWithCallback(
+    callback: (userToken: UserToken) => void,
+    forceRefresh: boolean = false,
+  ) {
     if (this.userToken && !forceRefresh) {
       callback(this.userToken);
       return;
@@ -60,7 +71,6 @@ export default class Auth {
         }, '*');
       }
     } catch {}
-    return '';
   }
 
   //////////////////////////////////////////////////////////////////////////////

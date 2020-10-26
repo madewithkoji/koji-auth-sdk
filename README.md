@@ -26,13 +26,13 @@ const auth = new Auth();
 Get the user's short-lived callback token and include it with a request to some kind of admin route
 
 ```
-auth.getToken((token) => {
-  fetch('/backend/some/admin/route', {
-    method: 'GET',
-    headers: {
-      authorization: token,
-    },
-  });
+const token = await auth.getToken();
+
+fetch('/backend/some/admin/route', {
+  method: 'GET',
+  headers: {
+    authorization: token,
+  },
 });
 
 ```
