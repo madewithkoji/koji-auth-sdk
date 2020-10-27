@@ -43,8 +43,8 @@ import Auth from '@withkoji/auth';
 
 app.get('/backend/some/admin/route', async (req, res) => {
   const auth = new Auth(
-    process.env.KOJI_PROJECT_ID,
-    process.env.KOJI_PROJECT_TOKEN,
+    res.locals.KOJI_PROJECT_ID,
+    res.locals.KOJI_PROJECT_TOKEN,
   );
 
   const role = await auth.getRole(req.headers.authorization);
