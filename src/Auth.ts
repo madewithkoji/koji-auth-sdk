@@ -14,6 +14,18 @@ export interface PushNotification {
   ref?: string;
 }
 
+export interface AuthGrant {
+  userId: string;
+  dateCreated: string;
+  pushNotificationsEnabled: boolean;
+  attributes: {[index: string]: any};
+}
+
+export enum AuthGrantCapability {
+  PUSH_NOTIFICATIONS = 'push_notifications',
+  USERNAME = 'username',
+}
+
 export default class Auth {
   private readonly projectId?: string;
   private readonly projectToken?: string;
@@ -52,19 +64,19 @@ export default class Auth {
 
   // Ask Koji for a token identifying the current user, which can be used to
   // resolve the user's role
-  public getToken(forceRefresh: boolean = false): Promise<UserToken> {
+  public getToken(grants: AuthGrantCapability[] = []): Promise<UserToken> {
     return new Promise((resolve) => {
       this.getTokenWithCallback((token) => {
         resolve(token);
-      }, forceRefresh);
+      }, grants);
     });
   }
 
   public getTokenWithCallback(
     callback: (userToken: UserToken) => void,
-    forceRefresh: boolean = false,
+    grants: AuthGrantCapability[] = [],
   ) {
-    if (this.userToken && !forceRefresh) {
+    if (this.userToken) {
       callback(this.userToken);
       return;
     }
@@ -75,6 +87,7 @@ export default class Auth {
       if (window && window.parent) {
         window.parent.postMessage({
           _kojiEventName: '@@koji/auth/getToken',
+          grants,
         }, '*');
       }
     } catch {}
@@ -83,6 +96,22 @@ export default class Auth {
   //////////////////////////////////////////////////////////////////////////////
   // Backend/validation methods
   //////////////////////////////////////////////////////////////////////////////
+  public async getGrant(userToken: UserToken): Promise<AuthGrant|null> {
+    try {
+      const request = await fetch(
+        this.buildUri('/v1/apps/auth/consumer/getGrantForToken'),
+        {
+          method: 'POST',
+          headers: this.getHeaders(userToken) as any,
+        },
+      );
+      const { grant } = await request.json();
+      return grant;
+    } catch (err) {
+      return null;
+    }
+  }
+
   public async getRole(userToken: UserToken): Promise<UserRole> {
     try {
       const request = await fetch(
@@ -99,7 +128,26 @@ export default class Auth {
     }
   }
 
-  // Push a notification to the owner of the pp
+  // Push a notification to a user
+  public async pushNotification(userId: string, notification: PushNotification): Promise<void> {
+    try {
+      await fetch(
+        this.buildUri('/v1/apps/auth/consumer/pushNotification'),
+        {
+          method: 'POST',
+          headers: this.getHeaders() as any,
+          body: JSON.stringify({
+            destination: userId,
+            notification,
+          }),
+        },
+      );
+    } catch (err) {
+      //
+    }
+  }
+
+  // Push a notification to the owner of the app
   public async pushNotificationToOwner(notification: PushNotification): Promise<void> {
     try {
       await fetch(
@@ -108,6 +156,7 @@ export default class Auth {
           method: 'POST',
           headers: this.getHeaders() as any,
           body: JSON.stringify({
+            destination: 'owner',
             notification,
           }),
         },
