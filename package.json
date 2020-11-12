@@ -1,6 +1,6 @@
 {
   "name": "@withkoji/auth",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "User authentication for Koji templates",
   "main": "./dist/index.js",
   "repository": {

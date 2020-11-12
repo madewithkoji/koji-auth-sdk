@@ -31,7 +31,7 @@ export default class Auth {
   private readonly projectToken?: string;
 
   private userToken?: string;
-  private tokenCallbacks: ((userToken: UserToken) => void)[] = [];
+  private tokenCallbacks: ((userToken: UserToken, err?: string) => void)[] = [];
   private grantCallbacks: ((hasGrants: boolean) => void)[] = [];
 
   constructor(projectId?: string, projectToken?: string) {
@@ -65,6 +65,17 @@ export default class Auth {
               console.log(err);
             }
           }
+
+          if (event === 'KojiAuth.GrantsDenied') {
+            try {
+              this.tokenCallbacks.forEach((callback) => {
+                callback(data.userToken, 'denied');
+              });
+              this.tokenCallbacks = [];
+            } catch (err) {
+              console.log(err);
+            }
+          }
         });
       }
     } catch (err) {}
@@ -76,15 +87,19 @@ export default class Auth {
   // Ask Koji for a token identifying the current user, which can be used to
   // resolve the user's role
   public getToken(grants: AuthGrantCapability[] = []): Promise<UserToken> {
-    return new Promise((resolve) => {
-      this.getTokenWithCallback((token) => {
-        resolve(token);
+    return new Promise((resolve, reject) => {
+      this.getTokenWithCallback((token, err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(token);
+        }
       }, grants);
     });
   }
 
   public getTokenWithCallback(
-    callback: (userToken: UserToken) => void,
+    callback: (userToken: UserToken, err?: string) => void,
     grants: AuthGrantCapability[] = [],
   ) {
     if (this.userToken) {
