@@ -32,6 +32,7 @@ export default class Auth {
 
   private userToken?: string;
   private tokenCallbacks: ((userToken: UserToken) => void)[] = [];
+  private grantCallbacks: ((hasGrants: boolean) => void)[] = [];
 
   constructor(projectId?: string, projectToken?: string) {
     this.projectId = projectId;
@@ -53,6 +54,17 @@ export default class Auth {
               console.log(err);
             }
           }
+
+          if (event === 'KojiAuth.GrantsResolved') {
+            try {
+              this.grantCallbacks.forEach((callback) => {
+                callback(data.hasGrants);
+              });
+              this.grantCallbacks = [];
+            } catch (err) {
+              console.log(err);
+            }
+          }
         });
       }
     } catch (err) {}
@@ -61,7 +73,6 @@ export default class Auth {
   //////////////////////////////////////////////////////////////////////////////
   // Public/frontend methods
   //////////////////////////////////////////////////////////////////////////////
-
   // Ask Koji for a token identifying the current user, which can be used to
   // resolve the user's role
   public getToken(grants: AuthGrantCapability[] = []): Promise<UserToken> {
@@ -91,6 +102,23 @@ export default class Auth {
         }, '*');
       }
     } catch {}
+  }
+
+  // Check if the user has one or more grants
+  public checkGrant(grants: AuthGrantCapability[] = []): Promise<boolean> {
+    return new Promise((resolve) => {
+      const callback = (hasGrants: boolean) => resolve(hasGrants);
+      this.grantCallbacks.push(callback);
+
+      try {
+        if (window && window.parent) {
+          window.parent.postMessage({
+            _kojiEventName: '@@koji/auth/checkGrant',
+            grants,
+          }, '*');
+        }
+      } catch {}
+    });
   }
 
   //////////////////////////////////////////////////////////////////////////////
