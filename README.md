@@ -1,4 +1,5 @@
 # Koji Auth SDK
+![npm (scoped)](https://img.shields.io/npm/v/@withkoji/auth?color=green&style=flat-square)
 
 **User authentication for Koji templates.**
 
