@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-export type UserToken = string;
+export type UserToken = string|null;
 export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
@@ -85,8 +85,14 @@ export default class Auth {
   // Public/frontend methods
   //////////////////////////////////////////////////////////////////////////////
   // Ask Koji for a token identifying the current user, which can be used to
-  // resolve the user's role
-  public getToken(grants: AuthGrantCapability[] = []): Promise<UserToken> {
+  // resolve the user's role. If `allowAnonymous` is true, the returned token
+  // will be `null` if the user is not logged in to Koji. If allowAnonymous is
+  // false or undefined, the user will be prompted to log in before a token is
+  // generated
+  public getToken(
+    grants: AuthGrantCapability[] = [],
+    allowAnonymous: boolean = false,
+  ): Promise<UserToken> {
     return new Promise((resolve, reject) => {
       this.getTokenWithCallback((token, err) => {
         if (err) {
@@ -94,13 +100,14 @@ export default class Auth {
         } else {
           resolve(token);
         }
-      }, grants);
+      }, grants, allowAnonymous);
     });
   }
 
   public getTokenWithCallback(
     callback: (userToken: UserToken, err?: string) => void,
     grants: AuthGrantCapability[] = [],
+    allowAnonymous: boolean = false,
   ) {
     if (this.userToken) {
       callback(this.userToken);
@@ -114,6 +121,7 @@ export default class Auth {
         window.parent.postMessage({
           _kojiEventName: '@@koji/auth/getToken',
           grants,
+          allowAnonymous,
         }, '*');
       }
     } catch {}
