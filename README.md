@@ -5,6 +5,9 @@
 
 ## Overview
 
+**NOTE:**
+This package is deprecated and is included only for backwards compatibility. For new templates, use @withkoji/core.
+
 The @withkoji/auth package enables you to authenticate users in Koji templates. This package provides methods for determining the current user’s role (whether or not the user created the Koji). It also enables the template to send notifications to the creator’s Koji account.
 
 ## Installation
