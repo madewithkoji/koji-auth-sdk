@@ -1,14 +1,15 @@
-# Koji Auth SDK
+# Koji Auth (deprecated)
 ![npm (scoped)](https://img.shields.io/npm/v/@withkoji/auth?color=green&style=flat-square)
 
 **User authentication for Koji templates.**
 
 ## Overview
 
-**[DEPRECATED]**
-This package is deprecated and is included only for backwards compatibility. For new templates, use [@withkoji/core](https://developer.withkoji.com/reference/packages/withkoji-koji-core).
-
 The @withkoji/auth package enables you to authenticate users in Koji templates. This package provides methods for determining the current user’s role (whether or not the user created the Koji). It also enables the template to send notifications to the creator’s Koji account.
+
+**[DEPRECATED]**
+This package is deprecated and is included only for backwards compatibility.
+For new templates, use [@withkoji/core](https://developer.withkoji.com/reference/core/withkoji-koji-core).
 
 ## Installation
 
@@ -18,7 +19,7 @@ Install the package in the frontend and backend services of your Koji project.
 npm install --save @withkoji/auth
 ```
 
-**NOTE:** To support instant remixes of your template, you must also install the [@withkoji/vcc package](https://developer.withkoji.com/reference/packages/withkoji-vcc-package) and implement the `VccMiddleware` on your backend server. This middleware maintains the environment variables for instant remixes, ensuring that user authentication applies to the correct remix version.
+**NOTE:** To support instant remixes of your template, you must also install the [@withkoji/vcc package](https://developer.withkoji.com/reference/deprecated-packages/withkoji-vcc-package) and implement the `VccMiddleware` on your backend server. This middleware maintains the environment variables for instant remixes, ensuring that user authentication applies to the correct remix version.
 
 ## Basic use
 
@@ -44,6 +45,7 @@ fetch('/backend/some/admin/route', {
 ```
 
 Instantiate `Auth` on the backend and use it to verify the user's role.
+
 ```
 import Auth from '@withkoji/auth';
 
@@ -65,7 +67,7 @@ app.get('/backend/some/admin/route', async (req, res) => {
 
 ## Related resources
 
-* [Package documentation](https://developer.withkoji.com/reference/packages/withkoji-koji-auth-sdk)
+* [Package documentation](https://developer.withkoji.com/reference/deprecated-packages/withkoji-koji-auth-sdk)
 * [Koji homepage](http://withkoji.com/)
 
 ## Contributions and questions
